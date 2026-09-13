@@ -1,9 +1,12 @@
 
 
 import { engine } from "@/core/engine";
-import { KeyboardEventPayload } from "../events";
+import { CORE_EVENTS, KeyboardEventPayload } from "../events";
 
-type KeyboardEventChannel = 'keyboard' | 'keydown' | 'keyup';
+type KeyboardEventChannel =
+  | typeof CORE_EVENTS.KEYBOARD
+  | typeof CORE_EVENTS.KEY_DOWN
+  | typeof CORE_EVENTS.KEY_UP;
 
 export class KeyboardEventService {
 
@@ -33,8 +36,8 @@ export class KeyboardEventService {
   publishKeyboardUpEvent(event:KeyboardEvent){
     if(this.keyPressedMap.has(event.code)){
       const keyboardEvent = new CustomKeyboardEvent(event.code, event);
-      engine.bus.publish('keyboard', keyboardEvent);
-      engine.bus.publish('keyup', keyboardEvent);
+      engine.bus.publish(CORE_EVENTS.KEYBOARD, keyboardEvent);
+      engine.bus.publish(CORE_EVENTS.KEY_UP, keyboardEvent);
       this.keyPressedMap.delete(event.code);
     }
   }
@@ -42,8 +45,8 @@ export class KeyboardEventService {
   publishKeyboardDownEvent(event:KeyboardEvent){
     if(!this.keyPressedMap.has(event.code)){
       const keyboardEvent = new CustomKeyboardEvent(event.code, event);
-      engine.bus.publish('keyboard', keyboardEvent);
-      engine.bus.publish('keydown', keyboardEvent);
+      engine.bus.publish(CORE_EVENTS.KEYBOARD, keyboardEvent);
+      engine.bus.publish(CORE_EVENTS.KEY_DOWN, keyboardEvent);
       this.keyPressedMap.set(event.code,event);
     }
   }

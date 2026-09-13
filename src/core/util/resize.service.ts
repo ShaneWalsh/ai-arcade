@@ -1,26 +1,17 @@
-import { Injectable } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
+import { engine } from "@/core/engine";
+import { CORE_EVENTS } from "../events";
 
-@Injectable({
-  providedIn: 'root'
-})
 export class ResizeService {
-
-  static get onResize$(): Observable<Window> {
-    return this.resizeSubject.asObservable();
-  }
-
-  public static resizeSubject: Subject<Window> = new Subject();
-
   constructor() {}
 
   public static publishResizeEvent(event: UIEvent) {
     console.log("publishResizeEvent");
-    ResizeService.resizeSubject.next(<Window>event.target);
+    engine.bus.publish(CORE_EVENTS.RESIZE, event.target as Window);
   }
 
   public static publishFullscreenchangeEvent(event: UIEvent) {
     console.log("publishFullscreenchangeEvent I should probably do something with this :/ ");
+    engine.bus.publish(CORE_EVENTS.FULLSCREEN_CHANGE, event);
   }
 
 }

@@ -7,7 +7,7 @@ Available Building Blocks (See `.github/skills/game-engine/` for API specs):
 - `PhysicsEngine` - 2D collision & movement system
 - `RenderPipeline` - Canvas/WebGL draw batcher
 
+RULE: You are allowed to change files under src/game ONLY. core is off limits, UNLESS core_update is included in the prompt.
 RULE: When writing game logic, use these existing utilities. Read the skill documentation before calling methods.
-RULE: You are allowed to change files under src/game ONLY. core is off limits.
 RULE: Use the drawing functions to whenever you need to draw anything for the game. 
 RULE: Whenever audio should be played, just add a comment, e.g for explosion //play explosion sound

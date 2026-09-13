@@ -1,4 +1,6 @@
 
+import { engine } from "@/core/engine";
+import { CORE_EVENTS } from "../events";
 
 export class MouseService {
   public static isClickListening: boolean=true;
@@ -42,10 +44,10 @@ export class MouseService {
     console.log("mouseClick",e);
     if(this.isClickListening === true){
 			if(e.button == 0){
-        MouseService.leftClickSubject.next(this.createMouseInteraction(e));
+        engine.bus.publish(CORE_EVENTS.MOUSE_LEFT_CLICK, this.createMouseInteraction(e));
 			}
 			else if(e.button == 2){
-        MouseService.rightClickSubject.next(this.createMouseInteraction(e));
+        engine.bus.publish(CORE_EVENTS.MOUSE_RIGHT_CLICK, this.createMouseInteraction(e));
 			}
     }
   }
@@ -54,10 +56,10 @@ export class MouseService {
     console.log("mouseClickRelease",e);
     if(this.isClickListening === true){
       if(e.button == 0){ // left
-        MouseService.leftClickReleaseSubject.next(this.createMouseInteraction(e));
+        engine.bus.publish(CORE_EVENTS.MOUSE_LEFT_RELEASE, this.createMouseInteraction(e));
       }
       else if(e.button == 2){ // right
-        MouseService.rightClickReleaseSubject.next(this.createMouseInteraction(e));
+        engine.bus.publish(CORE_EVENTS.MOUSE_RIGHT_RELEASE, this.createMouseInteraction(e));
       }
     }
   }
@@ -65,8 +67,8 @@ export class MouseService {
   public static mouseWheel(e:any){
     if(this.isClickListening === true){
       // scale += event.deltaY * -0.01;
-      if(ConfigService.isDebug)console.log("mouseWheel",e);
-			MouseService.mouseWheelSubject.next(this.createMouseInteraction(e));
+      // if(ConfigService.isDebug)console.log("mouseWheel",e);
+      engine.bus.publish(CORE_EVENTS.MOUSE_WHEEL, this.createMouseInteraction(e));
     }
   }
 
@@ -77,7 +79,7 @@ export class MouseService {
 
 	public static doubleClick(e:any) {
     if(this.isClickListening === true){
-      MouseService.doubleClickSubject.next(this.createMouseInteraction(e));
+      engine.bus.publish(CORE_EVENTS.MOUSE_DOUBLE_CLICK, this.createMouseInteraction(e));
     }
   }
 
