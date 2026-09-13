@@ -1,6 +1,7 @@
 
 
 import { engine } from "@/core/engine";
+import { KeyboardEventPayload } from "../events";
 
 type KeyboardEventChannel = 'keyboard' | 'keydown' | 'keyup';
 
@@ -13,14 +14,14 @@ export class KeyboardEventService {
 
   public subscribe(
     channel: KeyboardEventChannel,
-    callback: (event?: CustomKeyboardEvent) => void,
+    callback: (event?: KeyboardEventPayload) => void,
   ): () => void {
     return engine.bus.subscribe(channel, callback);
   }
 
   public unsubscribe(
     channel: KeyboardEventChannel,
-    callback: (event?: CustomKeyboardEvent) => void,
+    callback: (event?: KeyboardEventPayload) => void,
   ): void {
     engine.bus.unsubscribe(channel, callback);
   }
@@ -31,7 +32,7 @@ export class KeyboardEventService {
 
   publishKeyboardUpEvent(event:KeyboardEvent){
     if(this.keyPressedMap.has(event.code)){
-      const keyboardEvent = new CustomKeyboardEvent(event);
+      const keyboardEvent = new CustomKeyboardEvent(event.code, event);
       engine.bus.publish('keyboard', keyboardEvent);
       engine.bus.publish('keyup', keyboardEvent);
       this.keyPressedMap.delete(event.code);
@@ -40,7 +41,7 @@ export class KeyboardEventService {
 
   publishKeyboardDownEvent(event:KeyboardEvent){
     if(!this.keyPressedMap.has(event.code)){
-      const keyboardEvent = new CustomKeyboardEvent(event);
+      const keyboardEvent = new CustomKeyboardEvent(event.code, event);
       engine.bus.publish('keyboard', keyboardEvent);
       engine.bus.publish('keydown', keyboardEvent);
       this.keyPressedMap.set(event.code,event);
@@ -53,8 +54,8 @@ export class KeyboardEventService {
 }
 
 
-export class CustomKeyboardEvent {
-  constructor(public event:KeyboardEvent){
+export class CustomKeyboardEvent implements KeyboardEventPayload {
+  constructor(public code:string, public originalEvent:KeyboardEvent){
 
   }
 }

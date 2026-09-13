@@ -1,52 +1,11 @@
-import { Injectable } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
-import { ConfigService } from '../../../services/config.service';
-import { Target } from '../../data/Common';
 
-@Injectable({
-  providedIn: 'root'
-})
+
 export class MouseService {
   public static isClickListening: boolean=true;
   public static mouseX: number;
   public static mouseY: number;
   public static osl: number=0; // offsetleft X
   public static ost: number=0; // offsettop Y
-
-  static get leftClickSubject$(): Observable<MouseInteraction> {
-    return this.leftClickSubject.asObservable();
-  }
-  public static leftClickSubject: Subject<MouseInteraction> = new Subject();
-
-  static get dragSubject$(): Observable<MouseInteraction> {
-    return this.dragSubject.asObservable();
-  }
-  public static dragSubject: Subject<MouseInteraction> = new Subject();
-
-  static get rightClickSubject$(): Observable<MouseInteraction> {
-    return this.rightClickSubject.asObservable();
-  }
-  public static rightClickSubject: Subject<MouseInteraction> = new Subject();
-
-  static get leftClickReleaseSubject$(): Observable<MouseInteraction> {
-    return this.leftClickReleaseSubject.asObservable();
-  }
-  public static leftClickReleaseSubject: Subject<MouseInteraction> = new Subject();
-
-  static get rightClickReleaseSubject$(): Observable<MouseInteraction> {
-    return this.rightClickReleaseSubject.asObservable();
-  }
-  public static rightClickReleaseSubject: Subject<MouseInteraction> = new Subject();
-
-  static get doubleClickSubject$(): Observable<MouseInteraction> {
-    return this.doubleClickSubject.asObservable();
-  }
-  public static doubleClickSubject: Subject<MouseInteraction> = new Subject();
-
-  static get mouseWheelSubject$(): Observable<MouseInteraction> {
-    return this.mouseWheelSubject.asObservable();
-  }
-  public static mouseWheelSubject: Subject<MouseInteraction> = new Subject();
 
   // NO DEPS, shared service
   constructor() {}
@@ -59,12 +18,12 @@ export class MouseService {
     return new MouseCords(this.mouseX,this.mouseY,this.osl,this.ost)
   }
 
-  public static resizeUpdateOffsets(element) {
+  public static resizeUpdateOffsets(element:any) {
     MouseService.osl = element.offsetLeft;
     MouseService.ost = element.offsetTop;
   }
 
-  public static setupMouseListeners(element) {
+  public static setupMouseListeners(element:any) {
     element.addEventListener("mousemove", MouseService.updateMousePosition.bind(MouseService), false);
     element.addEventListener("dblclick", MouseService.doubleClick.bind(MouseService), false);
     element.addEventListener("mousedown", MouseService.mouseClick.bind(MouseService), false);
@@ -74,7 +33,7 @@ export class MouseService {
     MouseService.resizeUpdateOffsets(element);
   }
 
-  public static updateMousePosition(e){
+  public static updateMousePosition(e:any){
 		this.mouseX =  Math.floor(e.pageX - this.osl);
 		this.mouseY =  Math.floor(e.pageY - this.ost);
 	}
@@ -91,7 +50,7 @@ export class MouseService {
     }
   }
 
-	public static mouseClickRelease(e){
+	public static mouseClickRelease(e:any){
     console.log("mouseClickRelease",e);
     if(this.isClickListening === true){
       if(e.button == 0){ // left
@@ -103,7 +62,7 @@ export class MouseService {
     }
   }
 
-  public static mouseWheel(e){
+  public static mouseWheel(e:any){
     if(this.isClickListening === true){
       // scale += event.deltaY * -0.01;
       if(ConfigService.isDebug)console.log("mouseWheel",e);
@@ -111,12 +70,12 @@ export class MouseService {
     }
   }
 
-	public static rightClickContext(e){ // this is just a catch for the context menu, to prevent it from appearing.
+	public static rightClickContext(e:any){ // this is just a catch for the context menu, to prevent it from appearing.
     console.log("rightClickContext",e);
 		e.preventDefault();
 	}
 
-	public static doubleClick(e) {
+	public static doubleClick(e:any) {
     if(this.isClickListening === true){
       MouseService.doubleClickSubject.next(this.createMouseInteraction(e));
     }
@@ -137,13 +96,13 @@ export class MouseCords {
 
   }
 
-  /**
-   * The x and y already factor in the screen offsets.
-   * @returns
-   */
-  target():Target {
-    return new Target(this.mouseX, this.mouseY);
-  }
+  // /**
+  //  * The x and y already factor in the screen offsets.
+  //  * @returns
+  //  */
+  // target():Target {
+  //   return new Target(this.mouseX, this.mouseY);
+  // }
 }
 
 export class MouseInteraction {
