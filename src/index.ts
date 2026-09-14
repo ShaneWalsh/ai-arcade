@@ -3,6 +3,7 @@ import './style.css';
 import { GameRunner } from '@/core/GameRunner';
 import { SpaceInvadersGame } from '@/games/space-invaders';
 import { KeyboardEventService } from './core/util/keyboard-event.service';
+import { MouseService } from './core/util/mouse.service';
 
 let isLoaded = false;
 // Main app entry point
@@ -31,6 +32,9 @@ function handleKeyDown(event: KeyboardEvent): void {
 // Register global window listeners
 window.addEventListener('keyup', handleKeyUp);
 window.addEventListener('keydown', handleKeyDown);
+
+// Mouse
+MouseService.setupMouseListeners(document.getElementById("gameContainer"));
 
 // Start app when DOM is ready
 window.addEventListener('DOMContentLoaded', bootstrap);

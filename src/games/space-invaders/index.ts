@@ -1,15 +1,15 @@
 import { GameModule } from '@/core/types';
-import { engine } from '@/core/engine';
 import { DrawingContext } from '@/core/common/display/DrawingContext';
+import { SubscriptionsHolder } from '@/core/common/SubscriptionsHolder';
 import { CORE_EVENTS } from '@/core/events';
 
 export class SpaceInvadersGame implements GameModule {
   public id = 'space-invaders';
   private x = 50;
+  private subscriptions = new SubscriptionsHolder();
 
   public init(): void {
-    // Subscribe to events using your simple PubSub
-    engine.bus.subscribe(CORE_EVENTS.KEY_DOWN, (data) => {
+    this.subscriptions.subscribe(CORE_EVENTS.KEY_DOWN, (data) => {
       if (data.code === 'ArrowRight') this.x += 10;
     });
   }
@@ -25,7 +25,6 @@ export class SpaceInvadersGame implements GameModule {
   }
 
   public destroy(): void {
-    // Clear listeners/timers when switching away from this game
-    engine.bus.clear();
+    this.subscriptions.destroy();
   }
 }

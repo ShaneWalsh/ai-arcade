@@ -5,6 +5,7 @@ export class LogicService {
   public static RADIANCAL= 180/Math.PI;
   public static DEGREECAL= Math.PI/180;
 
+  // NO DEPS, shared service
   constructor() { }
 
   /**

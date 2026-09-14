@@ -13,6 +13,7 @@ export class KeyboardEventService {
   // add a map to only trigger the key down once, then /// <reference path="
   private static keyPressedMap:Map<string,KeyboardEvent> = new Map();
 
+  // NO DEPS, shared service
   constructor() {}
 
   public subscribe(channel: KeyboardEventChannel,callback: (event?: KeyboardEventPayload) => void,): () => void {
