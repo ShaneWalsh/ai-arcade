@@ -11,21 +11,15 @@ type KeyboardEventChannel =
 export class KeyboardEventService {
 
   // add a map to only trigger the key down once, then /// <reference path="
-  private keyPressedMap:Map<string,KeyboardEvent> = new Map();
+  private static keyPressedMap:Map<string,KeyboardEvent> = new Map();
 
   constructor() {}
 
-  public subscribe(
-    channel: KeyboardEventChannel,
-    callback: (event?: KeyboardEventPayload) => void,
-  ): () => void {
+  public subscribe(channel: KeyboardEventChannel,callback: (event?: KeyboardEventPayload) => void,): () => void {
     return engine.bus.subscribe(channel, callback);
   }
 
-  public unsubscribe(
-    channel: KeyboardEventChannel,
-    callback: (event?: KeyboardEventPayload) => void,
-  ): void {
+  public unsubscribe( channel: KeyboardEventChannel, callback: (event?: KeyboardEventPayload) => void, ): void {
     engine.bus.unsubscribe(channel, callback);
   }
 
@@ -33,7 +27,7 @@ export class KeyboardEventService {
     engine.bus.clear(channel);
   }
 
-  publishKeyboardUpEvent(event:KeyboardEvent){
+  public static publishKeyboardUpEvent(event:KeyboardEvent){
     if(this.keyPressedMap.has(event.code)){
       const keyboardEvent = new CustomKeyboardEvent(event.code, event);
       engine.bus.publish(CORE_EVENTS.KEYBOARD, keyboardEvent);
@@ -42,7 +36,7 @@ export class KeyboardEventService {
     }
   }
 
-  publishKeyboardDownEvent(event:KeyboardEvent){
+  public static publishKeyboardDownEvent(event:KeyboardEvent){
     if(!this.keyPressedMap.has(event.code)){
       const keyboardEvent = new CustomKeyboardEvent(event.code, event);
       engine.bus.publish(CORE_EVENTS.KEYBOARD, keyboardEvent);
@@ -51,14 +45,14 @@ export class KeyboardEventService {
     }
   }
 
-  clearKeyPressMap(){
+  public static clearKeyPressMap(){
     this.keyPressedMap = new Map();
   }
 }
 
 
 export class CustomKeyboardEvent implements KeyboardEventPayload {
-  constructor(public code:string, public originalEvent:KeyboardEvent){
+  constructor(public code:string, public event:KeyboardEvent){
 
   }
 }

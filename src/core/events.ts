@@ -1,7 +1,7 @@
 // 1. Payload Interfaces (tells human & AI what data comes with the event)
 export interface KeyboardEventPayload {
   code: string;
-  originalEvent: KeyboardEvent;
+  event: KeyboardEvent;
 }
 
 export interface MouseEventPayload {
@@ -16,9 +16,9 @@ export interface MouseEventPayload {
 
 // 2. Strongly Typed Event Map
 export interface GameEventMap {
-  keyboard: KeyboardEventPayload;
-  keydown: KeyboardEventPayload;
-  keyup: KeyboardEventPayload;
+  'core:keyboard': KeyboardEventPayload;
+  'core:keydown': KeyboardEventPayload;
+  'core:keyup': KeyboardEventPayload;
   'mouse:left-click': MouseEventPayload;
   'mouse:right-click': MouseEventPayload;
   'mouse:left-release': MouseEventPayload;
@@ -32,9 +32,9 @@ export interface GameEventMap {
 
 // 3. String Constants (Prevents typos like 'key-down' vs 'keydown')
 export const CORE_EVENTS = {
-  KEYBOARD: 'keyboard',
-  KEY_DOWN: 'keydown',
-  KEY_UP: 'keyup',
+  KEYBOARD: 'core:keyboard',
+  KEY_DOWN: 'core:keydown',
+  KEY_UP: 'core:keyup',
   MOUSE_LEFT_CLICK: 'mouse:left-click',
   MOUSE_RIGHT_CLICK: 'mouse:right-click',
   MOUSE_LEFT_RELEASE: 'mouse:left-release',

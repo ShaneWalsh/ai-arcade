@@ -1,10 +1,5 @@
-import { Injectable } from '@angular/core';
-import { Cord, Cords, Size } from '../../data/Common';
-import { HitBox } from '../support/Hitbox';
+import { Cord, Cords } from "../common/CommonCords";
 
-@Injectable({
-  providedIn: 'root'
-})
 export class LogicService {
 
   public static RADIANCAL= 180/Math.PI;
@@ -27,7 +22,7 @@ export class LogicService {
    * @param imgSizeY
    * @param angle
    */
-  public static topLeftAfterRotation(parCenterX, parCenterY, point2X, point2Y, imgSizeX, imgSizeY, angle) :{x:number,y:number, xR:number, yR:number} {
+  public static topLeftAfterRotation(parCenterX: number, parCenterY: number, point2X: number, point2Y: number, imgSizeX: number, imgSizeY: number, angle: number) :{x:number,y:number, xR:number, yR:number} {
     let halfImageSizeX = imgSizeX/2;
     let halfImageSizeY = imgSizeY/2;
     let cords = this.pointAfterRotation(parCenterX, parCenterY, point2X + halfImageSizeX, point2Y + halfImageSizeY, angle);
@@ -43,7 +38,7 @@ export class LogicService {
    * @param angle
    * @returns
    */
-  public static pointAfterRotation(centerX, centerY, point2X, point2Y, angle) :{x:number,y:number} {
+  public static pointAfterRotation(centerX: number, centerY: number, point2X: number, point2Y: number, angle: number) :{x:number,y:number} {
     var x1 = point2X - centerX;
     var y1 = point2Y - centerY;
 
@@ -63,7 +58,7 @@ export class LogicService {
 	 * and workout the x,y from the translateX + Y - sx+sy.
 	 *
 	 */
-  public static drawRotateImage(imageObj, ctx, rotation, x, y, sx, sy, lx = x, ly = y, lxs = sx, lys = sy, translateX = x + (sx / 2), translateY = y + (sy / 2)) {
+  public static drawRotateImage(imageObj: CanvasImageSource, ctx: CanvasRenderingContext2D, rotation: number, x: number, y: number, sx: number, sy: number, lx: number = x, ly: number = y, lxs: number = sx, lys: number = sy, translateX: number = x + (sx / 2), translateY: number = y + (sy / 2)) {
     // bitwise transformations to remove floating point values, canvas drawimage is faster with integers
     lx = (0.5 + lx) << 0;
     ly = (0.5 + ly) << 0;
@@ -80,7 +75,7 @@ export class LogicService {
     ctx.restore();
   }
 
-  public static drawRotateBorder(lineWidth, color, ctx, rotation, x, y, sx, sy, translateX = x + (sx / 2), translateY = y + (sy / 2)) {
+  public static drawRotateBorder(lineWidth: number, color: string, ctx: CanvasRenderingContext2D, rotation: number, x: number, y: number, sx: number, sy: number, translateX: number = x + (sx / 2), translateY: number = y + (sy / 2)) {
     // bitwise transformations to remove floating point values, canvas drawimage is faster with integers
     translateX = (0.5 + translateX) << 0;
     translateY = (0.5 + translateY) << 0;
@@ -95,13 +90,13 @@ export class LogicService {
     ctx.restore();
   }
 
-	public static drawBorder(x,y,sizeX,sizeY,ctx,color,lineWidth=1){
+  public static drawBorder(x: number,y: number,sizeX: number,sizeY: number,ctx: CanvasRenderingContext2D,color: string,lineWidth: number = 1){
     ctx.lineWidth = lineWidth;
   	ctx.strokeStyle = color;
   	ctx.strokeRect(x,y,sizeX,sizeY);
   }
 
-	public static drawBorderJustCorners(x,y,sizeX,sizeY,dist,color, ctx){
+  public static drawBorderJustCorners(x: number,y: number,sizeX: number,sizeY: number,dist: number,color: string, ctx: CanvasRenderingContext2D){
     ctx.save();
     ctx.lineWidth = 5;
   	ctx.strokeStyle = color;
@@ -116,23 +111,23 @@ export class LogicService {
     ctx.restore();
   }
 
-  public static writeOnCanvas(x,y,text,size,color1,ctx){
+  public static writeOnCanvas(x: number,y: number,text: string,size: number,color1: string,ctx: CanvasRenderingContext2D){
     ctx.font = size + "px 'Century Gothic'"; // Supertext 01
     ctx.fillStyle = color1;
     ctx.fillText(text, x, y+size);
     //ctx.fill();
   }
 
-  public static posDiff(a,b):number {
+  public static posDiff(a: number,b: number):number {
     return (a > b)? a - b:b - a;
   }
 
   // 0 -> (max-1)
-  public static getRandomInt(max) {
+  public static getRandomInt(max: number): number {
     return Math.floor(Math.random() * Math.floor(max));
   }
   //https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
-  public static shuffle(array) {
+  public static shuffle(array: any[]): any[] {
     let currentIndex = array.length,  randomIndex;
     // While there remain elements to shuffle.
     while (currentIndex != 0) {
@@ -146,7 +141,7 @@ export class LogicService {
     return array;
   }
 
-  public static radianToDegree(radians){
+  public static radianToDegree(radians: number): number {
     var deg = radians * this.RADIANCAL;
     if(deg < 0){
         return deg+360;
@@ -156,23 +151,23 @@ export class LogicService {
       }
   }
 
-  public static radianToDegreeFloor(radians){
+  public static radianToDegreeFloor(radians: number): number {
     return Math.floor(this.radianToDegree(radians))
   }
 
-  public static degreeToRadian(degrees){
+  public static degreeToRadian(degrees: number): number {
     return degrees * this.DEGREECAL;
   }
 
-  public static Create2DArray(rows) {
-    var gridA = [];
+  public static Create2DArray(rows: number): any[][] {
+    var gridA: any[][] = [];
     for (var i=0;i<rows;i++) {
        gridA[i] = [];
     }
     return gridA;
   }
 
-  public static drawPath(x,y,xx,yy,color,ctx){
+  public static drawPath(x: number,y: number,xx: number,yy: number,color: string,ctx: CanvasRenderingContext2D){
     ctx.beginPath();
     ctx.moveTo(x+32, y+32);
     ctx.lineTo(xx, yy);
@@ -180,7 +175,7 @@ export class LogicService {
     ctx.stroke();
   }
 
-  public static drawLine(x,y,xx,yy,color,ctx){
+  public static drawLine(x: number,y: number,xx: number,yy: number,color: string,ctx: CanvasRenderingContext2D){
     ctx.beginPath();
     ctx.moveTo(x, y);
     ctx.lineTo(xx, yy);
@@ -188,7 +183,7 @@ export class LogicService {
     ctx.stroke();
   }
 
-  public static drawBox(x,y,sX,sY,ctx,fillColour,borderColor,lineWidth=2){
+  public static drawBox(x: number,y: number,sX: number,sY: number,ctx: CanvasRenderingContext2D,fillColour: string,borderColor: string,lineWidth: number = 2){
     ctx.lineWidth = lineWidth;
     ctx.fillStyle = fillColour;
     ctx.fillRect(x, y, sX, sY);
@@ -196,13 +191,13 @@ export class LogicService {
     ctx.strokeRect(x,y,sX,sY);
   }
 
-  public static drawNoBorder(x,y,sX,sY,ctx,fillColour,lineWidth=2){
+  public static drawNoBorder(x: number,y: number,sX: number,sY: number,ctx: CanvasRenderingContext2D,fillColour: string,lineWidth: number = 2){
     ctx.lineWidth = lineWidth;
     ctx.fillStyle = fillColour;
     ctx.fillRect(x, y, sX, sY);
   }
 
-  public static drawIsoBox(x,y,sX,sY,ctx,colour){
+  public static drawIsoBox(x: number,y: number,sX: number,sY: number,ctx: CanvasRenderingContext2D,colour: string){
     let hX= sX/2;
     let hY= sY/2;
     this.drawLine(x+hX,y,x+sX,y+hY,colour,ctx);
@@ -242,7 +237,7 @@ export class LogicService {
    * y2: The bottom right y2
    * @returns
    */
-  public static getRectCords(p1x,p1y,p2x,p2y):{x:number,y:number,sx:number,sy:number,x2:number,y2:number}{
+  public static getRectCords(p1x: number,p1y: number,p2x: number,p2y: number):{x:number,y:number,sx:number,sy:number,x2:number,y2:number}{
     if(p1x > p2x){
       if(p1y > p2y){ // p1 is bottom right
         return {x:p2x, y:p2y, sx:p1x-p2x, sy:p1y - p2y, x2:p1x, y2:p1y}
@@ -299,7 +294,7 @@ export class LogicService {
   }
 
   // move values from one array to another while iterating over them and running some logic
-  public static moveBetweenArrays(fromArray: any[], toArray: any[], func:any) {
+  public static moveBetweenArrays(fromArray: any[], toArray: any[], func: (value: any) => boolean) {
     for( let i = 0; i < fromArray.length; i++ ) {
       if(func(fromArray[i])){
         toArray.push(fromArray.splice(i));
@@ -309,7 +304,7 @@ export class LogicService {
   }
 
   // https://stackoverflow.com/questions/2752725/finding-whether-a-point-lies-inside-a-rectangle-or-not/37865332#37865332
-  public static isPointInRectangle(m:{x,y}, r: {TL:{x,y}, TR:{x,y}, BL:{x,y}, BR:{x,y}} ):boolean {
+  public static isPointInRectangle(m: {x: number, y: number}, r: {TL: {x: number, y: number}, TR: {x: number, y: number}, BL: {x: number, y: number}, BR: {x: number, y: number}} ):boolean {
     var AB = LogicService.vector(r.BL, r.TL);
     var AM = LogicService.vector(r.BL, m);
     var BC = LogicService.vector(r.TL, r.TR);
@@ -324,10 +319,10 @@ export class LogicService {
     return this.isPointInRectangle({x:c.posX,y:c.posY},{TL:{x:hb.posX,y:hb.posY}, TR:{x:hb.posX+hb.sizeX,y:hb.posY},
        BL:{x:hb.posX,y:hb.posY+hb.sizeY}, BR:{x:hb.posX+hb.sizeX,y:hb.posY+hb.sizeY}})
   }
-  private static vector(p1, p2) {
+  private static vector(p1: {x: number, y: number}, p2: {x: number, y: number}): {x: number, y: number} {
     return {x: (p2.x - p1.x), y: (p2.y - p1.y)};
   }
-  private static dot(u, v) {
+  private static dot(u: {x: number, y: number}, v: {x: number, y: number}): number {
     return u.x * v.x + u.y * v.y;
   }
 }

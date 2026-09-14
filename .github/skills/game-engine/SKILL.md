@@ -18,3 +18,39 @@ Import core services directly from `@/core/engine`:
 ## API Cheat-Sheet
 - For Event Specs: Refer to `references/pubsub.md`
 - For Physics Specs: Refer to `references/physics.md`
+
+---
+name: game-module-builder
+description: Teaches Copilot how to build or update game modules implementing the standard GameModule interface. Trigger when writing games.
+---
+
+# Game Module Standard Blueprint
+
+When generating or modifying a game under `@/games/`, strictly adhere to this exact structural template:
+
+```typescript
+import { GameModule } from '@/core/types';
+import { engine } from '@/core/engine';
+import { DrawingContext } from '@/core/common/display/DrawingContext';
+import { CORE_EVENTS } from '@/core/events';
+
+export class [GameName]Game implements GameModule {
+  public id = '[game-id-slug]';
+
+  public init(): void | Promise<void> {
+    // 1. Subscribe to events using engine.bus
+    // 2. Setup game entities and state
+  }
+
+  public update(deltaTime: number): void {
+    // 1. Process entity updates, physics, and movement
+  }
+
+  public render(dc: DrawingContext): void {
+    // 1. Use the custom DrawingContext dc.cc context for rendering
+  }
+
+  public destroy(): void {
+    // 1. Clean up event listeners via engine.bus.clear()
+  }
+}

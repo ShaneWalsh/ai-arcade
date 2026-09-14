@@ -22,6 +22,7 @@ export class PubSub {
    * Publish data to all subscribers of an event
    */
   publish(event: string, data?: any): void {
+    console.log("Publish Event "+event);
     const callbacks = this.events[event];
     if (callbacks) {
       callbacks.forEach((callback) => callback(data));
