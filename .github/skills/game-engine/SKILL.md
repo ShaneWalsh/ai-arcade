@@ -14,6 +14,7 @@ When asked to generate or modify a game:
 Do NOT pass engine instances into constructors. 
 Import core services directly from `@/core/engine`:
 `import { engine } from "@/core/engine";`
+Access all engines, e.g PubSub, through `engine`; never pass a PubSub instance into game objects or helpers as a parameter.
 
 ## API Cheat-Sheet
 - For Event Specs: Refer to `references/pubsub.md`

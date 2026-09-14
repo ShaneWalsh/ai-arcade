@@ -18,3 +18,5 @@ RULE: Whenever audio should be played, just add a comment, e.g for explosion //p
 - Every game MUST implement the `GameModule` interface from `@/core/types`.
 - Never create standalone game loops or standalone `<canvas>` instances inside game classes. The core engine manages rendering frames and canvas state.
 - Always import the central `engine` singleton from `@/core/engine`.
+- Always access engines, e.g PubSub through `engine.bus`; never pass a PubSub instance into game objects or helpers as a constructor or method parameter.
+- Whenever creating a subscription in an entity, create a local property SubscriptionsHolder, and in the entity destroy method call SubscriptionsHolder.destroy
