@@ -1,16 +1,8 @@
-import { engine } from "../engine";
 
 export type Unsubscribe = () => void;
 
 export class SubscriptionsHolder {
 	public subscriptions: Unsubscribe[] = [];
-
-	public subscribe(
-		event: string,
-		callback: Parameters<typeof engine.bus.subscribe>[1],
-	): Unsubscribe {
-		return this.add(engine.bus.subscribe(event, callback));
-	}
 
 	public add(unsubscribe: Unsubscribe): Unsubscribe {
 		this.subscriptions.push(unsubscribe);

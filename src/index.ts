@@ -4,6 +4,7 @@ import { GameRunner } from '@/core/GameRunner';
 import { SpaceInvadersGame } from '@/games/space-invaders';
 import { KeyboardEventService } from './core/util/keyboard-event.service';
 import { MouseService } from './core/util/mouse.service';
+import MissileStormTowerDefenceGame from './games/missileStorm-towerdefence';
 
 let isLoaded = false;
 // Main app entry point

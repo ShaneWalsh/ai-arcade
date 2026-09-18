@@ -1,3 +1,4 @@
+import { engine } from '@/core/engine';
 import { GameModule } from '@/core/types';
 import { DrawingContext } from '@/core/common/display/DrawingContext';
 import { SubscriptionsHolder } from '@/core/common/SubscriptionsHolder';
@@ -45,8 +46,8 @@ export class SpaceInvadersGame implements GameModule {
 
   private subscriptions = new SubscriptionsHolder();
   private state: GameState = 'title';
-  private width = 800;
-  private height = 600;
+  private width = 960;
+  private height = 540;
   private playerX = 379;
   private playerLives = 3;
   private playerRespawn = 0;
@@ -71,8 +72,8 @@ export class SpaceInvadersGame implements GameModule {
   private shields: ShieldCell[] = [];
 
   public init(): void {
-    this.subscriptions.subscribe(CORE_EVENTS.KEY_DOWN, (data) => this.onKeyDown(data as KeyboardEventPayload));
-    this.subscriptions.subscribe(CORE_EVENTS.KEY_UP, (data) => this.keys.delete((data as KeyboardEventPayload).code));
+    this.subscriptions.add(engine.bus.subscribe(CORE_EVENTS.KEY_DOWN, (data) => this.onKeyDown(data as KeyboardEventPayload)));
+    this.subscriptions.add(engine.bus.subscribe(CORE_EVENTS.KEY_UP, (data) => this.keys.delete((data as KeyboardEventPayload).code)));
   }
 
   public update(deltaTime: number): void {
@@ -102,15 +103,10 @@ export class SpaceInvadersGame implements GameModule {
     const effects = dc.cc.canvasGame2Ctx;
     const hud = dc.cc.canvasHUD1Ctx;
     const overlay = dc.cc.canvasHUD2Ctx;
-    this.resizeCanvases(dc);
 
     background.fillStyle = '#07131f';
     background.fillRect(0, 0, this.width, this.height);
     this.drawStars(background);
-    game.clearRect(0, 0, this.width, this.height);
-    effects.clearRect(0, 0, this.width, this.height);
-    hud.clearRect(0, 0, this.width, this.height);
-    overlay.clearRect(0, 0, this.width, this.height);
 
     if (this.state === 'title') {
       this.drawTitle(overlay);
@@ -288,19 +284,6 @@ export class SpaceInvadersGame implements GameModule {
     this.playerRespawn = 1.2;
     this.projectiles = this.projectiles.filter((projectile) => projectile.fromPlayer);
     if (this.playerLives <= 0) this.state = 'game-over';
-  }
-
-  private resizeCanvases(dc: DrawingContext): void {
-    const canvas = dc.cc.canvasGame1El as HTMLCanvasElement;
-    const nextWidth = Math.max(640, Math.min(960, window.innerWidth));
-    const nextHeight = Math.max(480, Math.min(720, window.innerHeight));
-    if (canvas.width === nextWidth && canvas.height === nextHeight) return;
-    this.width = nextWidth;
-    this.height = nextHeight;
-    const canvases = [dc.cc.canvasBG1El, dc.cc.canvasBG2El, dc.cc.canvasGame1El, dc.cc.canvasGame2El, dc.cc.canvasHUD1El, dc.cc.canvasHUD2El];
-    canvases.forEach((layer) => { layer.width = this.width; layer.height = this.height; });
-    this.playerX = this.width / 2 - PLAYER_WIDTH / 2;
-    if (this.state === 'playing') this.buildWave();
   }
 
   private drawStars(context: CanvasRenderingContext2D): void {

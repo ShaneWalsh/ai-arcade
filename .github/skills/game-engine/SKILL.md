@@ -18,13 +18,16 @@ Access all engines, e.g PubSub, through `engine`; never pass a PubSub instance i
 
 ## API Cheat-Sheet
 - For Event Specs: Refer to `references/pubsub.md`
-- For Physics Specs: Refer to `references/physics.md`
+- For Utility Logic: Refer to `references/logicService.md`
+
+# Logic Utilities
+`LogicService` is a **dependency-free shared utility service** for common 2D game/Canvas logic. Prefer using these utilities instead of implementing duplicate math/drawing helpers. 
+If a method is missing or needs improving, please advise Human.
 
 ---
 name: game-module-builder
 description: Teaches Copilot how to build or update game modules implementing the standard GameModule interface. Trigger when writing games.
 ---
-
 # Game Module Standard Blueprint
 
 When generating or modifying a game under `@/games/`, strictly adhere to this exact structural template:
