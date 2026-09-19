@@ -12,6 +12,8 @@ RULE: When writing game logic, use these existing utilities. Read the skill docu
 RULE: Use the drawing functions to whenever you need to draw anything for the game. 
 RULE: Whenever audio should be played, just add a comment, e.g for explosion //play explosion sound
 RULE: Do not clear the canvas in game logic. Do not use clearRect() from inside the game. Leave all clearing to the main renderer.
+RULE: Write inteligent readable code for Human to manual update or extend, nothing fancy.
+
 
 # Repository Rules
 
