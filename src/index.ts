@@ -4,7 +4,9 @@ import { GameRunner } from '@/core/GameRunner';
 import { SpaceInvadersGame } from '@/games/space-invaders';
 import { KeyboardEventService } from './core/util/keyboard-event.service';
 import { MouseService } from './core/util/mouse.service';
-import MissileStormTowerDefenceGame from './games/missileStorm-towerdefence';
+import TestPathingGame from './games/testpathing';
+
+export * from './core/types';
 
 let isLoaded = false;
 // Main app entry point
@@ -12,7 +14,7 @@ async function bootstrap() {
   const runner = new GameRunner();
 
   // Default game loaded on startup (Easy to swap later via UI/dropdown)
-  const defaultGame = new SpaceInvadersGame();
+  const defaultGame = new TestPathingGame();
   isLoaded = true;
   
   await runner.loadGame(defaultGame);

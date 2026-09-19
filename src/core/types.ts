@@ -1,4 +1,4 @@
-import { DrawingContext } from "./common/display/DrawingContext";
+import type { DrawingContext } from "./common/display/DrawingContext";
 
 export interface GameModule {
   /** Identifier for the game (e.g. 'space-invaders') */
@@ -15,4 +15,18 @@ export interface GameModule {
   
   /** Called when switching games. Clean up listeners, timers, and game state. */
   destroy(): void;
+}
+
+export interface IBot2d {
+	id: string;
+  team: string;
+	radius?: number;
+}
+
+export interface IGridMap {
+	isValidPosition(x: number, y: number): boolean;
+	isWalkable(x: number, y: number, bot?: IBot2d): boolean;
+	getTileCost(x: number, y: number): number;
+	getWidth(): number;
+	getHeight(): number;
 }
