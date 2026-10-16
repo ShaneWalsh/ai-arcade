@@ -23,6 +23,12 @@
       place-items: center;
     }
 
+    #app-root {
+      position: fixed;
+      z-index: 20;
+      inset: 0;
+    }
+
     /* Stacks all canvases inside the 960x540 area */
     #gameContainer > canvas {
       grid-area: 1 / 1;

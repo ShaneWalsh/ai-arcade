@@ -3,6 +3,9 @@ import { CORE_EVENTS, KeyboardEventPayload } from '@/core/events';
 import { SubscriptionsHolder } from '@/core/common/SubscriptionsHolder';
 import { DrawingContext } from '@/core/common/display/DrawingContext';
 import { GameModule } from '@/core/types';
+import { Modal } from '@/core/ui/Modal';
+import { ScreenManager } from '@/core/ui/ScreenManager';
+import { GameMenuScreen } from '@/games/GameMenuScreen';
 
 type GameState = 'title' | 'playing' | 'level-complete' | 'victory' | 'game-over';
 type Terrain = 'grass' | 'road' | 'water' | 'rock' | 'base';
@@ -50,10 +53,18 @@ export class MissileStormTowerDefenceGame implements GameModule {
 	private aliens: Alien[] = [];
 	private turrets: Turret[] = [];
 	private shots: Shot[] = [];
+	private screenManager: ScreenManager | null = null;
+	private menuState: GameState | null = null;
+	private readonly modal = new Modal();
+	private restartPending = false;
 
 	public init(): void {
 		this.subscriptions.add(engine.bus.subscribe(CORE_EVENTS.KEY_DOWN, (data) => this.onKeyDown(data as KeyboardEventPayload)));
 		this.subscriptions.add(engine.bus.subscribe(CORE_EVENTS.MOUSE_LEFT_CLICK, (data) => this.onClick(data)));
+		const uiRoot = document.getElementById('app-root');
+		if (!uiRoot) throw new Error('The game UI requires an element with id "app-root".');
+		this.screenManager = new ScreenManager(uiRoot);
+		this.syncMenuScreen();
 	}
 
 	public update(deltaTime: number): void {
@@ -71,6 +82,7 @@ export class MissileStormTowerDefenceGame implements GameModule {
 				else this.state = 'level-complete';
 			} else if (this.waveTimer > 1.4) this.startWave(this.wave + 1);
 		}
+		this.syncMenuScreen();
 	}
 
 	public render(dc: DrawingContext): void {
@@ -79,7 +91,6 @@ export class MissileStormTowerDefenceGame implements GameModule {
 		const game = dc.cc.canvasGame1Ctx;
 		const effects = dc.cc.canvasGame2Ctx;
 		const hud = dc.cc.canvasHUD1Ctx;
-		const overlay = dc.cc.canvasHUD2Ctx;
 		background.fillStyle = '#09131f';
 		background.fillRect(0, 0, this.width, this.height);
 		this.drawBackdrop(background);
@@ -87,8 +98,7 @@ export class MissileStormTowerDefenceGame implements GameModule {
 		this.drawTurrets(game);
 		this.drawAliens(game);
 		this.drawShots(effects);
-		this.drawHud(hud);
-		if (this.state !== 'playing') this.drawOverlay(overlay);
+		if (this.state === 'playing') this.drawHud(hud);
 	}
 
 	public destroy(): void {
@@ -96,13 +106,18 @@ export class MissileStormTowerDefenceGame implements GameModule {
 		this.aliens = [];
 		this.turrets = [];
 		this.shots = [];
+		this.screenManager?.destroy();
+		this.screenManager = null;
+		this.menuState = null;
 	}
 
 	private onKeyDown(data: KeyboardEventPayload): void {
 		const code = data.code;
 		if (code === 'Enter' && this.state === 'level-complete') this.advanceLevel();
-		else if (code === 'Enter' && this.state !== 'playing') this.startGame();
-		if (code === 'KeyR') this.startGame();
+		else if (code === 'Enter' && this.state === 'title') this.startGame();
+		else if (code === 'Enter' && this.state !== 'playing') void this.confirmRestart();
+		if (code === 'KeyR' && (this.state === 'playing' || this.state === 'title')) this.startGame();
+		else if (code === 'KeyR' && this.state !== 'playing') void this.confirmRestart();
 		if (code === 'Digit1') this.selectedType = 'machine';
 		if (code === 'Digit2') this.selectedType = 'cannon';
 		if (code === 'Digit3') this.selectedType = 'missile';
@@ -144,6 +159,7 @@ export class MissileStormTowerDefenceGame implements GameModule {
 		this.selectedTurret = undefined;
 		this.setPath();
 		this.startWave(1);
+		this.syncMenuScreen();
 	}
 
 	private advanceLevel(): void {
@@ -151,6 +167,7 @@ export class MissileStormTowerDefenceGame implements GameModule {
 		this.state = 'playing';
 		this.setPath();
 		this.startWave(1);
+		this.syncMenuScreen();
 	}
 
 	private startWave(wave: number): void {
@@ -371,16 +388,62 @@ export class MissileStormTowerDefenceGame implements GameModule {
 		context.fillText(`SELECTED: ${TURRET_LABELS[this.selectedType]}   CLICK: BUILD/SELECT   U: UPGRADE`, 22, this.height - 13);
 	}
 
-	private drawOverlay(context: CanvasRenderingContext2D): void {
-		context.fillStyle = 'rgba(5, 14, 24, 0.86)'; context.fillRect(0, 0, this.width, this.height);
-		context.textAlign = 'center';
-		const title = this.state === 'title' ? 'HUMANS VS ALIENS' : this.state === 'level-complete' ? `LEVEL ${this.level} SECURED` : this.state === 'victory' ? 'EARTH HOLDS' : 'BASE OVERRUN';
-		context.fillStyle = this.state === 'game-over' ? '#ff806e' : '#b6f0d0'; context.font = 'bold 34px monospace'; context.fillText(title, this.width / 2, this.height / 2 - 45);
-		context.fillStyle = '#e4f6e9'; context.font = '15px monospace';
-		const message = this.state === 'title' ? 'Build the line. Keep the base alive.' : this.state === 'level-complete' ? 'Press ENTER to deploy on the next level.' : this.state === 'victory' ? 'Two levels defended. Press R to play again.' : 'The last transmission was lost. Press R to restart.';
-		context.fillText(message, this.width / 2, this.height / 2 + 5);
-		context.fillStyle = '#f2c14e'; context.font = 'bold 18px monospace'; context.fillText(this.state === 'playing' ? '' : 'PRESS ENTER', this.width / 2, this.height / 2 + 52);
-		context.textAlign = 'left';
+	private async confirmRestart(): Promise<void> {
+		if (this.restartPending) return;
+		this.restartPending = true;
+		try {
+			if (await this.modal.confirm('Restart defence?', 'Your current defence progress will be lost.')) {
+				this.startGame();
+			}
+		} finally {
+			this.restartPending = false;
+		}
+	}
+
+	private syncMenuScreen(): void {
+		if (!this.screenManager) return;
+		if (this.state === 'playing') {
+			if (this.menuState !== null) this.screenManager.clear();
+			this.menuState = null;
+			return;
+		}
+		if (this.menuState === this.state) return;
+
+		this.menuState = this.state;
+		const menu = this.state === 'title'
+			? {
+				title: 'HUMANS VS ALIENS',
+				message: 'Build the line. Keep the base alive.',
+				actionLabel: 'Deploy defence',
+			}
+			: this.state === 'level-complete'
+				? {
+					title: `LEVEL ${this.level} SECURED`,
+					message: 'The base is holding. Deploy to the next level.',
+					actionLabel: 'Next level',
+				}
+				: this.state === 'victory'
+					? {
+						title: 'EARTH HOLDS',
+						message: 'Two levels defended. The base is secure.',
+						actionLabel: 'Play again',
+					}
+					: {
+						title: 'BASE OVERRUN',
+						message: 'The last transmission was lost.',
+						actionLabel: 'Restart defence',
+					};
+
+		this.screenManager.show(new GameMenuScreen({
+			...menu,
+			helpTitle: 'Missile Storm // defence briefing',
+			helpContent: 'Build: press 1-4 to select a turret, then click a grass tile. Select a turret: click it. Upgrade: U. Deploy or advance: Enter.',
+			onAction: () => {
+				if (this.state === 'title') this.startGame();
+				else if (this.state === 'level-complete') this.advanceLevel();
+				else void this.confirmRestart();
+			},
+		}));
 	}
 }
 

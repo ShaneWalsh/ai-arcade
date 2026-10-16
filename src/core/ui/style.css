@@ -1,0 +1,275 @@
+:root {
+  color-scheme: dark;
+  --sim-ui-background: #101820;
+  --sim-ui-surface: #192630;
+  --sim-ui-surface-raised: #223440;
+  --sim-ui-border: #3b505c;
+  --sim-ui-text: #e4edf0;
+  --sim-ui-muted: #9aadb5;
+  --sim-ui-accent: #73c6a1;
+  --sim-ui-accent-hover: #91d8b6;
+  --sim-ui-danger: #e47d76;
+  font-family: "Segoe UI", Arial, sans-serif;
+  color: var(--sim-ui-text);
+  background: var(--sim-ui-background);
+}
+
+html,
+body {
+  min-width: 320px;
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  min-height: 100vh;
+  background:
+    radial-gradient(ellipse at 50% 0%, #1d3039 0%, transparent 65%),
+    var(--sim-ui-background);
+}
+
+button {
+  font: inherit;
+}
+
+.sim-ui-root {
+  min-height: 100vh;
+  pointer-events: none;
+}
+
+.sim-ui-screen {
+  box-sizing: border-box;
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+  padding: 32px;
+  background:
+    linear-gradient(135deg, rgb(16 24 32 / 92%), rgb(16 24 32 / 78%)),
+    repeating-linear-gradient(0deg, transparent 0 39px, rgb(115 198 161 / 5%) 40px);
+  pointer-events: auto;
+}
+
+.sim-ui-game-menu {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgb(3 9 15 / 64%);
+  pointer-events: auto;
+}
+
+.sim-ui-game-menu-card {
+  width: min(620px, 100%);
+  text-align: center;
+}
+
+.sim-ui-game-menu-card .sim-ui-screen-copy {
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.sim-ui-game-menu-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+.sim-ui-screen-card {
+  width: min(680px, 100%);
+  padding: 36px;
+  border: 1px solid var(--sim-ui-border);
+  border-radius: 8px;
+  background: rgb(25 38 48 / 94%);
+  box-shadow: 0 24px 80px rgb(0 0 0 / 35%);
+}
+
+.sim-ui-eyebrow {
+  margin: 0 0 12px;
+  color: var(--sim-ui-accent);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.sim-ui-screen-title {
+  margin: 0;
+  font-size: clamp(28px, 5vw, 42px);
+  letter-spacing: 0.02em;
+}
+
+.sim-ui-screen-copy {
+  max-width: 56ch;
+  margin: 16px 0 24px;
+  color: var(--sim-ui-muted);
+  line-height: 1.6;
+}
+
+.sim-ui-button {
+  min-height: 40px;
+  padding: 9px 16px;
+  border: 1px solid var(--sim-ui-border);
+  border-radius: 4px;
+  color: var(--sim-ui-text);
+  background: var(--sim-ui-surface-raised);
+  cursor: pointer;
+  transition: background-color 140ms ease, border-color 140ms ease, transform 140ms ease;
+}
+
+.sim-ui-button:hover {
+  border-color: var(--sim-ui-accent);
+  background: #2c424d;
+}
+
+.sim-ui-button:active {
+  transform: translateY(1px);
+}
+
+.sim-ui-button:focus-visible {
+  outline: 2px solid var(--sim-ui-accent);
+  outline-offset: 2px;
+}
+
+.sim-ui-button-primary {
+  border-color: var(--sim-ui-accent);
+  color: #102018;
+  background: var(--sim-ui-accent);
+  font-weight: 700;
+}
+
+.sim-ui-button-primary:hover {
+  border-color: var(--sim-ui-accent-hover);
+  background: var(--sim-ui-accent-hover);
+}
+
+.sim-ui-button-secondary {
+  background: transparent;
+}
+
+.sim-ui-window {
+  position: fixed;
+  z-index: 100;
+  box-sizing: border-box;
+  width: min(420px, calc(100vw - 32px));
+  overflow: hidden;
+  border: 1px solid var(--sim-ui-border);
+  border-radius: 6px;
+  color: var(--sim-ui-text);
+  background: var(--sim-ui-surface);
+  box-shadow: 0 18px 50px rgb(0 0 0 / 45%);
+}
+
+.sim-ui-window-titlebar {
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 0 12px 0 16px;
+  border-bottom: 1px solid var(--sim-ui-border);
+  background: var(--sim-ui-surface-raised);
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.sim-ui-window-titlebar.is-dragging {
+  cursor: grabbing;
+}
+
+.sim-ui-window-title {
+  overflow: hidden;
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sim-ui-window-close {
+  display: grid;
+  width: 30px;
+  min-height: 30px;
+  flex: 0 0 auto;
+  place-items: center;
+  padding: 0;
+  border-color: transparent;
+  background: transparent;
+  color: var(--sim-ui-muted);
+  font-size: 22px;
+  line-height: 1;
+}
+
+.sim-ui-window-close:hover {
+  border-color: var(--sim-ui-danger);
+  color: var(--sim-ui-danger);
+}
+
+.sim-ui-window-body {
+  padding: 20px;
+  line-height: 1.6;
+}
+
+.sim-ui-modal-backdrop {
+  position: fixed;
+  z-index: 1000;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgb(3 8 12 / 76%);
+  backdrop-filter: blur(3px);
+}
+
+.sim-ui-modal {
+  box-sizing: border-box;
+  width: min(460px, 100%);
+  padding: 24px;
+  border: 1px solid var(--sim-ui-border);
+  border-radius: 8px;
+  background: var(--sim-ui-surface);
+  box-shadow: 0 24px 80px rgb(0 0 0 / 55%);
+}
+
+.sim-ui-modal-title {
+  margin: 0;
+  font-size: 20px;
+}
+
+.sim-ui-modal-message {
+  margin: 16px 0 24px;
+  color: var(--sim-ui-muted);
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.sim-ui-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+@media (max-width: 520px) {
+  .sim-ui-screen {
+    padding: 16px;
+  }
+
+  .sim-ui-screen-card {
+    padding: 24px;
+  }
+
+  .sim-ui-game-menu {
+    padding: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}

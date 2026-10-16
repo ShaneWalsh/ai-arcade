@@ -1,5 +1,5 @@
-// TypeScript does not have a declaration for CSS side-effect imports.
 import './style.css';
+import './core/ui/style.css';
 import { GameRunner } from '@/core/GameRunner';
 import { SpaceInvadersGame } from '@/games/space-invaders';
 import { KeyboardEventService } from './core/util/keyboard-event.service';

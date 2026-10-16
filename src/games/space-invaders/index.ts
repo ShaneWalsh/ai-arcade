@@ -3,6 +3,9 @@ import { GameModule } from '@/core/types';
 import { DrawingContext } from '@/core/common/display/DrawingContext';
 import { SubscriptionsHolder } from '@/core/common/SubscriptionsHolder';
 import { CORE_EVENTS, KeyboardEventPayload } from '@/core/events';
+import { Modal } from '@/core/ui/Modal';
+import { ScreenManager } from '@/core/ui/ScreenManager';
+import { GameMenuScreen } from '@/games/GameMenuScreen';
 
 type GameState = 'title' | 'playing' | 'game-over' | 'victory';
 type EnemyType = 'basic' | 'armored' | 'hunter';
@@ -70,10 +73,18 @@ export class SpaceInvadersGame implements GameModule {
   private enemies: Enemy[] = [];
   private projectiles: Projectile[] = [];
   private shields: ShieldCell[] = [];
+  private screenManager: ScreenManager | null = null;
+  private menuState: GameState | null = null;
+  private readonly modal = new Modal();
+  private restartPending = false;
 
   public init(): void {
     this.subscriptions.add(engine.bus.subscribe(CORE_EVENTS.KEY_DOWN, (data) => this.onKeyDown(data as KeyboardEventPayload)));
     this.subscriptions.add(engine.bus.subscribe(CORE_EVENTS.KEY_UP, (data) => this.keys.delete((data as KeyboardEventPayload).code)));
+    const uiRoot = document.getElementById('app-root');
+    if (!uiRoot) throw new Error('The game UI requires an element with id "app-root".');
+    this.screenManager = new ScreenManager(uiRoot);
+    this.syncMenuScreen();
   }
 
   public update(deltaTime: number): void {
@@ -95,6 +106,7 @@ export class SpaceInvadersGame implements GameModule {
       if (this.playerRespawn <= 0 && this.playerLives > 0) this.playerInvulnerable = 2;
     }
     if (this.enemies.length === 0) this.advanceWave();
+    this.syncMenuScreen();
   }
 
   public render(dc: DrawingContext): void {
@@ -102,14 +114,11 @@ export class SpaceInvadersGame implements GameModule {
     const game = dc.cc.canvasGame1Ctx;
     const effects = dc.cc.canvasGame2Ctx;
     const hud = dc.cc.canvasHUD1Ctx;
-    const overlay = dc.cc.canvasHUD2Ctx;
-
     background.fillStyle = '#07131f';
     background.fillRect(0, 0, this.width, this.height);
     this.drawStars(background);
 
     if (this.state === 'title') {
-      this.drawTitle(overlay);
       return;
     }
 
@@ -119,17 +128,20 @@ export class SpaceInvadersGame implements GameModule {
     this.drawPlayer(game);
     this.drawHud(hud);
 
-    if (this.state === 'game-over' || this.state === 'victory') this.drawEndScreen(overlay);
   }
 
   public destroy(): void {
     this.subscriptions.destroy();
     this.keys.clear();
+    this.screenManager?.destroy();
+    this.screenManager = null;
+    this.menuState = null;
   }
 
   private onKeyDown(data: KeyboardEventPayload): void {
     this.keys.add(data.code);
-    if (data.code === 'Enter' && this.state !== 'playing') this.startGame();
+    if (data.code === 'Enter' && this.state === 'title') this.startGame();
+    else if (data.code === 'Enter' && this.state !== 'playing') void this.confirmRestart();
     if ((data.code === 'Space' || data.code === 'KeyZ') && this.state === 'playing') this.fire();
     if (data.event) data.event.preventDefault();
   }
@@ -147,6 +159,7 @@ export class SpaceInvadersGame implements GameModule {
     this.hunterKills = 0;
     this.totalKills = 0;
     this.buildWave();
+    this.syncMenuScreen();
   }
 
   private buildWave(): void {
@@ -362,43 +375,55 @@ export class SpaceInvadersGame implements GameModule {
     return this.wave >= MAX_WAVES && this.state === 'victory' ? 'CLEAR' : `${Math.min(this.wave - 1, MAX_WAVES)}/${MAX_WAVES}`;
   }
 
-  private drawTitle(context: CanvasRenderingContext2D): void {
-    this.drawPanel(context, 'STARFALL // INVASION');
-    context.fillStyle = '#d8fff4';
-    context.font = '18px monospace';
-    context.textAlign = 'center';
-    context.fillText('A SMALL SHIP. FIVE WAVES. NO SECOND CHANCES.', this.width / 2, this.height / 2 - 40);
-    context.fillStyle = '#54e6c4';
-    context.font = 'bold 22px monospace';
-    context.fillText('PRESS ENTER TO DEPLOY', this.width / 2, this.height / 2 + 34);
-    context.font = '13px monospace';
-    context.fillStyle = '#8aa6b8';
-    context.fillText('ARROW KEYS / A D TO MOVE    SPACE / Z TO FIRE', this.width / 2, this.height / 2 + 70);
-    context.textAlign = 'left';
+  private async confirmRestart(): Promise<void> {
+    if (this.restartPending) return;
+    this.restartPending = true;
+    try {
+      if (await this.modal.confirm('Restart mission?', 'Your current mission progress will be lost.')) {
+        this.startGame();
+      }
+    } finally {
+      this.restartPending = false;
+    }
   }
 
-  private drawEndScreen(context: CanvasRenderingContext2D): void {
-    this.drawPanel(context, this.state === 'victory' ? 'SECTOR SECURED' : 'SIGNAL LOST');
-    context.fillStyle = this.state === 'victory' ? '#54e6c4' : '#ff756b';
-    context.font = 'bold 22px monospace';
-    context.textAlign = 'center';
-    context.fillText(`FINAL SCORE ${this.score}`, this.width / 2, this.height / 2 + 8);
-    context.font = '16px monospace';
-    context.fillText('PRESS ENTER TO RESTART', this.width / 2, this.height / 2 + 52);
-    context.textAlign = 'left';
-  }
+  private syncMenuScreen(): void {
+    if (!this.screenManager) return;
+    if (this.state === 'playing') {
+      if (this.menuState !== null) this.screenManager.clear();
+      this.menuState = null;
+      return;
+    }
+    if (this.menuState === this.state) return;
 
-  private drawPanel(context: CanvasRenderingContext2D, title: string): void {
-    context.fillStyle = 'rgba(4, 12, 20, 0.88)';
-    context.fillRect(0, 0, this.width, this.height);
-    context.strokeStyle = '#54e6c4';
-    context.lineWidth = 2;
-    context.strokeRect(this.width / 2 - 275, this.height / 2 - 120, 550, 260);
-    context.fillStyle = '#54e6c4';
-    context.font = 'bold 38px monospace';
-    context.textAlign = 'center';
-    context.fillText(title, this.width / 2, this.height / 2 - 78);
-    context.textAlign = 'left';
+    this.menuState = this.state;
+    const menu = this.state === 'title'
+      ? {
+          title: 'STARFALL // INVASION',
+          message: 'A small ship. Five waves. No second chances.',
+          actionLabel: 'Deploy',
+        }
+      : this.state === 'victory'
+        ? {
+            title: 'SECTOR SECURED',
+            message: `Final score: ${this.score}`,
+            actionLabel: 'Play again',
+          }
+        : {
+            title: 'SIGNAL LOST',
+            message: `Final score: ${this.score}. The mission has ended.`,
+            actionLabel: 'Restart mission',
+          };
+
+    this.screenManager.show(new GameMenuScreen({
+      ...menu,
+      helpTitle: 'Starfall // Invasion briefing',
+      helpContent: 'Move: Left/Right arrows or A/D. Fire: Space or Z. Deploy: Enter.',
+      onAction: () => {
+        if (this.state === 'title') this.startGame();
+        else void this.confirmRestart();
+      },
+    }));
   }
 
   private overlaps(ax: number, ay: number, aw: number, ah: number, bx: number, by: number, bw: number, bh: number): boolean {

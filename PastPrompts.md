@@ -132,3 +132,31 @@ Requirements:
    - Emits events when targets enter/leave sensor range, or when line of sight is lost.
 
 4. Provide clean TypeScript code with interface contracts (`IBot2d`, `IWorld`) and unit/integration tests demonstrating stealth detection and returning to a patrol path.
+
+
+
+
+
+# Building Menu System
+I am building a custom vanilla TypeScript HTML5/Node.js game engine for a text-and-menu heavy simulation game (no 3D or heavy canvas rendering for the UI). I need you to write a clean, modular TypeScript framework for managing UI screens, floating/movable windows, and modal popups inside the src/core/ui folder.
+
+Please create the following core modules using modern ES6 classes and standard CSS:
+
+1. ScreenManager.ts:
+- A class that handles switching between full-screen views (e.g., Main Menu, Barracks, Strategy Map).
+- It should mount and unmount screen classes cleanly from a designated root DOM container.
+
+2. Window.ts (Movable Windows):
+- A reusable window component class with a title bar, close button, and a content body.
+- Implement vanilla pointer events (pointerdown, pointermove, pointerup) so the user can click and drag the window around the screen by its title bar.
+
+3. Modal.ts:
+- A utility class to display popup dialogs (e.g., confirmations, alerts) with a backdrop overlay that blocks background interaction.
+
+4. BaseComponent.ts:
+- A lightweight base class with proper TypeScript typing that other UI elements (buttons, panels) can extend, providing basic helpers for rendering to the DOM and updating state.
+
+5. style.css:
+- Clean, modern, simulation-style CSS (think dark mode sci-fi/military management UI) using CSS variables for easy theming, flexbox/grid layouts, and smooth window dragging styles.
+
+Please write clean, well-typed TypeScript code with zero external dependencies (no React, no jQuery). Include a brief index.html and main.ts example showing how to initialize the ScreenManager and open a movable window.
